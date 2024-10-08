@@ -13,7 +13,9 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+from celery.schedules import crontab
 from dotenv import load_dotenv
+
 
 load_dotenv()
 
@@ -129,7 +131,7 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "static/"
-STATICFILES_DIRS = [BASE_DIR / "static"]
+# STATICFILES_DIRS = [BASE_DIR / "static"]
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -143,20 +145,6 @@ CORS_ALLOWED_ORIGINS = ["http://127.0.0.1"]
 CSRF_TRUSTED_ORIGINS = ["http://127.0.0.1"]
 
 
-# STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")CORS_ALLOW_ALL_ORIGINS
-# STRIPE_PUBLIC_KEY = os.getenv("STRIPE_PUBLIC_KEY")
-
-# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-# EMAIL_HOST = "smtp.yandex.ru"
-# EMAIL_PORT = 465
-
-# EMAIL_HOST_USER = os.getenv("EMAIL_USER")
-# EMAIL_HOST_PASSWORD = os.getenv("EMAIL_PASSWORD")
-# EMAIL_USE_SSL = True
-#
-# SERVER_EMAIL = EMAIL_HOST_USER
-# DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-
 SPECTACULAR_SETTINGS = {
     "TITLE": "Anna API habits",  # название проекта
     "VERSION": "0.0.1",  # версия проекта
@@ -167,39 +155,42 @@ SPECTACULAR_SETTINGS = {
     "COMPONENT_SPLIT_REQUEST": True,
 }
 
-# # URL-адрес брокера сообщений
-# CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
+# URL-адрес брокера сообщений
+CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
 
 # URL-адрес брокера результатов, также Redis
-# CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
-#
-# # Часовой пояс для работы Celery
-# CELERY_TIMEZONE = "Europe/Moscow"
+CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
+
+# Часовой пояс для работы Celery
+CELERY_TIMEZONE = "Europe/Moscow"
 
 # Флаг отслеживания выполнения задач
-# CELERY_TASK_TRACK_STARTED = True
-# CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
-# CELERY_BROKER_CONNECTION_MAX_RETRIES = None
-#
-# # Указываем форматы для сериализации данных (опционально)
-# CELERY_ACCEPT_CONTENT = ["json"]
-# CELERY_TASK_SERIALIZER = "json"
-# CELERY_RESULT_SERIALIZER = "json"
-#
-# # Использовать Django Celery Beat Scheduler
-# CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers.DatabaseScheduler"
-#
-# # Максимальное время на выполнение задачи
-# CELERY_TASK_TIME_LIMIT = 30 * 60
-#
-# CELERY_IMPORTS = (
-#     "materials.tasks",
-#     "users.tasks",
-# )
-#
-# CELERY_BEAT_SCHEDULE = {
-#     "deactivate_users": {
-#         "task": "users.tasks.deactivate_users",
-#         "schedule": crontab(minute="0", hour="0", day_of_week="5"),
-#     }
-# }
+CELERY_TASK_TRACK_STARTED = True
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+CELERY_BROKER_CONNECTION_MAX_RETRIES = None
+
+# Указываем форматы для сериализации данных (опционально)
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+
+# Использовать Django Celery Beat Scheduler
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers.DatabaseScheduler"
+
+# Максимальное время на выполнение задачи
+CELERY_TASK_TIME_LIMIT = 30 * 60
+
+CELERY_IMPORTS = (
+    "materials.tasks",
+    "users.tasks",
+)
+
+CELERY_BEAT_SCHEDULE = {
+    "send_habit_reminder_every_minute": {
+        "task": "habits.tasks.send_habit_reminder",
+        "schedule": crontab(minute="*"),
+    }
+}
+
+TELEGRAM_URL = 'https://api.telegram.org/bot'
+BOT_TOKEN = os.getenv('BOT_TOKEN')
