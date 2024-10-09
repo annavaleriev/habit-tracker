@@ -5,7 +5,10 @@ def validate_reward_or_linked_habit(reward, linked_habit):
     """Валидатор для проверки награды и связанной привычки"""
     if reward and linked_habit:
         raise ValidationError(
-            "Нельзя указать награду и связанную привычку одновременно"
+            {
+                "reward": "Нельзя указать награду и связанную привычку одновременно",
+                "linked_habit": "Нельзя указать награду и связанную привычку одновременно",
+            }
         )
 
 
@@ -21,23 +24,20 @@ def validate_linked_habit_is_pleasant_habit(linked_habit, pleasant_habit):
     """Валидатор для проверки связанной привычки, что она приятная"""
     if linked_habit and not pleasant_habit:
         raise ValidationError(
-            "Связанная привычка должна быть приятной"
+            {
+                "linked_habit": "Связанная привычка должна быть приятной",
+                "pleasant_habit": "Связанная привычка должна быть приятной",
+            }
         )
 
 
-def validate_pleasant_habit_reward_or_linked_habit(pleasant_habit, reward, linked_habit):
+def validate_pleasant_habit_reward(pleasant_habit, reward):
     """Валидатор для проверки, что у приятной привычки не может быть
-    вознаграждения или связанной привычки"""
-    if pleasant_habit:
-        if reward or linked_habit:
-            raise ValidationError(
-                "Приятная привычка не может иметь награды или связанной привычки"
-            )
-
-
-def validate_periodicity(periodicity):
-    """Валидатор для проверки периодичности привычки"""
-    if periodicity > 7:
+    вознаграждения"""
+    if pleasant_habit and reward:
         raise ValidationError(
-            "Привычка должна выполняться раз в 7 дней"
+            {
+                "pleasant_habit": "Приятная привычка не может иметь награды",
+                "reward": "Приятная привычка не может иметь награды",
+            }
         )

@@ -131,7 +131,6 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "static/"
-# STATICFILES_DIRS = [BASE_DIR / "static"]
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -157,9 +156,11 @@ SPECTACULAR_SETTINGS = {
 
 # URL-адрес брокера сообщений
 CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
+# CELERY_BROKER_URL = "redis://127.0.0.1:6380/0"
 
 # URL-адрес брокера результатов, также Redis
 CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
+# CELERY_RESULT_BACKEND = "redis://127.0.0.1:6380/0"
 
 # Часовой пояс для работы Celery
 CELERY_TIMEZONE = "Europe/Moscow"
@@ -181,16 +182,15 @@ CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers.DatabaseScheduler"
 CELERY_TASK_TIME_LIMIT = 30 * 60
 
 CELERY_IMPORTS = (
-    "materials.tasks",
-    "users.tasks",
+    "habits.tasks",
 )
 
-CELERY_BEAT_SCHEDULE = {
-    "send_habit_reminder_every_minute": {
-        "task": "habits.tasks.send_habit_reminder",
-        "schedule": crontab(minute="*"),
-    }
-}
+# CELERY_BEAT_SCHEDULE = {
+#     "send_habit_reminder_every_minute": {
+#         "task": "habits.tasks.send_habit_reminder",
+#         "schedule": crontab(minute="*"),
+#     }
+# }
 
 TELEGRAM_URL = 'https://api.telegram.org/bot'
 BOT_TOKEN = os.getenv('BOT_TOKEN')
