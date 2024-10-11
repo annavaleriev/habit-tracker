@@ -16,18 +16,15 @@ from pathlib import Path
 from celery.schedules import crontab
 from dotenv import load_dotenv
 
-
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-5c^)13w8j0f-#(zv_#8h$+--m3k7+%#vq+$_-!7-uj1osjm@gm'
 
-
 DEBUG = os.getenv("DEBUG") == "True"
 
 ALLOWED_HOSTS = ["*"]
-
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -43,6 +40,8 @@ INSTALLED_APPS = [
     'django_filters',
     'rest_framework_simplejwt',
     'drf_spectacular',
+    'django_celery_results',
+    'django_celery_beat',
 
 ]
 
@@ -73,8 +72,6 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True
-
 ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
@@ -94,7 +91,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
-
 
 DATABASES = {
     "default": {
@@ -142,7 +138,7 @@ AUTH_USER_MODEL = 'users.User'
 CORS_ALLOWED_ORIGINS = ["http://127.0.0.1"]
 
 CSRF_TRUSTED_ORIGINS = ["http://127.0.0.1"]
-
+CORS_ALLOW_ALL_ORIGINS = False
 
 SPECTACULAR_SETTINGS = {
     "TITLE": "Anna API habits",  # название проекта
@@ -156,10 +152,12 @@ SPECTACULAR_SETTINGS = {
 
 # URL-адрес брокера сообщений
 CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
+# CELERY_BROKER_URL = "redis://localhost:6379/0"
 # CELERY_BROKER_URL = "redis://127.0.0.1:6380/0"
 
 # URL-адрес брокера результатов, также Redis
 CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
+# CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
 # CELERY_RESULT_BACKEND = "redis://127.0.0.1:6380/0"
 
 # Часовой пояс для работы Celery

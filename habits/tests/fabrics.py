@@ -5,6 +5,9 @@ from factory import fuzzy
 from habits.models import Habit
 from users.models import User
 
+from datetime import time as dt_time
+import random
+
 
 class UserFactory(factory.django.DjangoModelFactory):
     """Фабрика для создания пользователей"""
@@ -29,8 +32,8 @@ class UserFactory(factory.django.DjangoModelFactory):
 class HabitFactory(factory.django.DjangoModelFactory):
     """Фабрика для создания привычек"""
     user = factory.SubFactory(UserFactory)
-    place = factory.Faker("place")
-    time = factory.LazyFunction(timezone.now)
+    place = factory.Faker("address")
+    time = factory.LazyFunction(lambda: dt_time(random.randint(0, 23), random.randint(0, 59)))
     habit_name = factory.Faker("word")
     pleasant_habit = factory.Faker("boolean")
     linked_habit = None
