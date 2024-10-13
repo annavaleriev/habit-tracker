@@ -16,7 +16,6 @@ class UserFactory(factory.django.DjangoModelFactory):
     )
     first_name = factory.Faker("first_name")
     last_name = factory.Faker("last_name")
-    # tg_user_id = factory.Faker("random_int", min=1, max=1000000000)
 
     class Meta:
         model = User

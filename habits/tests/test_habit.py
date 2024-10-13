@@ -23,6 +23,7 @@ class HabitTestCase(APITestCase):
         return response
 
 
+
 class ListHabitTestCase(HabitTestCase):
     """Тесты для списка привычек"""
 
@@ -47,7 +48,7 @@ class ListHabitTestCase(HabitTestCase):
         user_2 = UserFactory()
         self.authenticate_user(user_1)
 
-        HabitFactory.create_batch(3, user=user_2)
+        HabitFactory.create_batch(3, user=user_2, is_public=False)
         response = self.client.get(self.habit_list_url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -60,7 +61,17 @@ class CreateHabitTestCase(HabitTestCase):
     def test__post_habit__authenticated_user(self):
         """Создаем привычку для аутентифицированного пользователя"""
         user = UserFactory()
-        response = self.create_habit(user, habit_name="Бегать по утрам", place="Парк", time="08:00:00")
+        response = self.create_habit(
+            user,
+            habit_name="Бегать по утрам",
+            place="Парк",
+            time="08:00:00",
+            pleasant_habit=False,
+            periodicity=1,
+            reward="reward",
+            duration="00:01:00",
+            is_public=False
+        )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test__post_habit__without_required_fields(self):
@@ -76,23 +87,45 @@ class UpdateHabitTestCase(HabitTestCase):
     def update_habit(self, user, habit, **kwargs):
         """Обновляем привычку"""
         self.client.force_authenticate(user=user)
-        response = self.client.patch(reverse("habits:habit-detail", args=[habit.pk]), data=kwargs)
+        response = self.client.put(reverse("habits:habit-detail", args=[habit.pk]), data=kwargs)
         return response
 
     def test__patch_habit__authenticated_user(self):
         """Обновляем привычку для аутентифицированного пользователя"""
         user = UserFactory()
         habit = HabitFactory(user=user)
-        response = self.update_habit(user, habit, habit_name="Бегать по вечерам")
+        response = self.update_habit(
+            user,
+            habit,
+            habit_name="Бегать по вечерам",
+            place="Парк",
+            time="08:00:00",
+            pleasant_habit=False,
+            periodicity=1,
+            reward="reward",
+            duration="00:01:00",
+            is_public=False
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["habit_name"], "Бегать по вечерам")
 
     def test__patch_habit__not_owner(self):
         user = UserFactory()
         different_user = UserFactory()
-        habit = HabitFactory(user=different_user)
-        response = self.update_habit(user, habit, habit_name="Бегать по вечерам")
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        habit = HabitFactory(user=different_user, is_public=True)
+        response = self.update_habit(
+            user,
+            habit,
+            habit_name="Бегать по вечерам",
+            place="Парк",
+            time="08:00:00",
+            pleasant_habit=False,
+            periodicity=1,
+            reward="reward",
+            duration="00:01:00",
+            is_public=False
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
 class DeleteHabitTestCase(HabitTestCase):
@@ -101,6 +134,7 @@ class DeleteHabitTestCase(HabitTestCase):
     def test__delete_habit__owner_user(self):
         """Удаляем привычку для владельца"""
         user = UserFactory()
+        self.client.force_authenticate(user=user)
         habit = HabitFactory(user=user)
         response = self.client.delete(reverse("habits:habit-detail", args=[habit.pk]))
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
@@ -109,7 +143,7 @@ class DeleteHabitTestCase(HabitTestCase):
         """Удаляем привычку не владельцем"""
         user = UserFactory()
         different_user = UserFactory()
-        habit = HabitFactory(user=different_user)
+        habit = HabitFactory(user=different_user, is_public=True)
         self.authenticate_user(user)
         response = self.client.delete(reverse("habits:habit-detail", args=[habit.pk]))
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
