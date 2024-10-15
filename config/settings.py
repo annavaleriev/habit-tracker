@@ -92,16 +92,27 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": "fill_habits",
+#         "USER": "postgres",
+#         "PASSWORD": os.getenv("DATABASE_PASSWORD"),
+#         "PORT": os.getenv("DATABASE_PORT"),
+#         "HOST": os.getenv("DATABASE_HOST"),
+#     }
+# }
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "fill_habits",
-        "USER": "postgres",
-        "PASSWORD": os.getenv("DATABASE_PASSWORD"),
-        "PORT": os.getenv("DATABASE_PORT"),
-        "HOST": os.getenv("DATABASE_HOST"),
+        "NAME": os.getenv("POSTGRES_DB"),
+        "USER": os.getenv("POSTGRES_USER"),
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
+        "PORT": 5432,
+        "HOST": "db",
     }
 }
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -151,14 +162,12 @@ SPECTACULAR_SETTINGS = {
 }
 
 # URL-адрес брокера сообщений
-CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
-# CELERY_BROKER_URL = "redis://localhost:6379/0"
-# CELERY_BROKER_URL = "redis://127.0.0.1:6380/0"
+CELERY_BROKER_URL = "redis://redis:6379/0"
+
 
 # URL-адрес брокера результатов, также Redis
-CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
-# CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
-# CELERY_RESULT_BACKEND = "redis://127.0.0.1:6380/0"
+CELERY_RESULT_BACKEND = "redis://redis:6379/0"
+
 
 # Часовой пояс для работы Celery
 CELERY_TIMEZONE = "Europe/Moscow"
