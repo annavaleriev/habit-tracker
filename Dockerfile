@@ -1,31 +1,31 @@
 FROM python:3.11-slim
 
-#Устанавливаем рабоучую директорию
+# Устанавливаем рабочую директорию
 WORKDIR /app
 
-#Копируем файлы зависимостей
+# Устанавливаем системные зависимости, необходимые для psycopg2
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends gcc libpq-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+# Копируем файлы зависимостей
 COPY poetry.lock pyproject.toml ./
 
+# Устанавливаем Poetry
+RUN python -m pip install --no-cache-dir poetry==1.8.3
 
-# Устанавливаем Poetry и зависимости без dev-пакетов
-RUN python -m pip install --no-cache-dir poetry==1.8.3 \
-    && poetry config virtualenvs.create false \
-    && poetry install --no-dev --no-interaction --no-ansi \
-    && rm -rf $(poetry config cache-dir)/{cache,artifacts}
+# Устанавливаем зависимости без dev-пакетов
+RUN poetry config virtualenvs.create false && \
+    poetry install --only main --no-interaction --no-ansi
 
-
-#Копируеем все файлы проекта другие
+# Копируем все файлы проекта
 COPY . .
 
 # Копируем скрипт entrypoint
 COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh  # Убедитесь, что скрипт исполняемый
 
-
-# Команда запуска
-ENTRYPOINT ["/app/entrypoint.sh"]
-
-# Порт, который будет использовать сервер
-EXPOSE 8000
-
-#Миграции и запуск сервера
-CMD ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
+RUN pip cache purge && poetry cache clear --all pypi
+RUN apt-get autoremove -y \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
