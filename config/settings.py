@@ -92,16 +92,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.postgresql",
-#         "NAME": "fill_habits",
-#         "USER": "postgres",
-#         "PASSWORD": os.getenv("DATABASE_PASSWORD"),
-#         "PORT": os.getenv("DATABASE_PORT"),
-#         "HOST": os.getenv("DATABASE_HOST"),
-#     }
-# }
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -191,13 +182,6 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 CELERY_IMPORTS = (
     "habits.tasks",
 )
-
-# CELERY_BEAT_SCHEDULE = {
-#     "send_habit_reminder_every_minute": {
-#         "task": "habits.tasks.send_habit_reminder",
-#         "schedule": crontab(minute="*"),
-#     }
-# }
 
 TELEGRAM_URL = 'https://api.telegram.org/bot'
 BOT_TOKEN = os.getenv('BOT_TOKEN')
